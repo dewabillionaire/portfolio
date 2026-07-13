@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import { projects } from "@/lib/sample-data";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -9,11 +9,9 @@ export const dynamic = "force-dynamic";
 
 export default async function ProjectDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const project = await prisma.project.findUnique({
-    where: { slug },
-  });
+  const project = projects.find((item) => item.slug === slug) ?? null;
 
-  if (!project || !project.published) {
+  if (!project) {
     redirect("/projects");
   }
 
@@ -33,15 +31,10 @@ export default async function ProjectDetail({ params }: { params: Promise<{ slug
           ))}
         </div>
         <div className="mt-5 flex flex-wrap gap-4 text-sm">
-          {project.link ? (
-            <Link href={project.link} target="_blank" className="hover:underline">Live</Link>
-          ) : null}
-          {project.repo ? (
-            <Link href={project.repo} target="_blank" className="hover:underline">Repository</Link>
-          ) : null}
+          <Link href={`/projects/${project.slug}`} className="hover:underline">Details</Link>
         </div>
         <div className="mt-8 rounded-lg border bg-neutral-50 p-5 text-sm leading-relaxed whitespace-pre-wrap dark:bg-neutral-900">
-          {project.content}
+          {project.description}
         </div>
       </div>
     </article>
